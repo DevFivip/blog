@@ -28,6 +28,9 @@ use Filament\Tables\Columns\SelectColumn;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Support\Str;
 
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
+
 class PostResource extends Resource
 {
     protected static ?string $model = Post::class;
@@ -80,16 +83,24 @@ class PostResource extends Resource
                             ->schema([
                                 Section::make()
                                     ->schema([
-                                        FileUpload::make('featured_image')
-                                            ->label('Imagen destacada')
-                                            ->disk('public')
-                                            ->image()
+
+                                        // FileUpload::make('featured_image')
+                                        //     ->label('Imagen destacada')
+                                        //     ->disk('public')
+                                        //     ->image()
+                                        //     ->imageEditor()
+                                        //     ->imageEditorAspectRatios([
+                                        //         '16:9',
+                                        //         '4:3',
+                                        //         '1:1',
+                                        //     ]),
+
+                                        SpatieMediaLibraryFileUpload::make('featured_image')
+                                            // ->multiple()
                                             ->imageEditor()
-                                            ->imageEditorAspectRatios([
-                                                '16:9',
-                                                '4:3',
-                                                '1:1',
-                                            ]),
+                                            // ->reorderable()
+                                            ->preserveFilenames()
+                                            ->openable()
                                     ]),
                                 Section::make('')
                                     ->schema([
@@ -133,11 +144,16 @@ class PostResource extends Resource
     {
         return $table
             ->columns([
-                ImageColumn::make('featured_image')
-                    ->disk('public')
-                    ->square()
-                    ->height(50)
-                    ->extraImgAttributes(['loading' => 'lazy']),
+
+                // ImageColumn::make('featured_image')
+                //     ->disk('public')
+                //     ->square()
+                //     ->height(50)
+                //     ->extraImgAttributes(['loading' => 'lazy']),
+
+                SpatieMediaLibraryImageColumn::make('featured_image')
+                    ->conversion('thumb'),
+
                 TextColumn::make('title')
                     ->description(fn (Post $record): string => $record->author->name)
                     ->wrap(),
