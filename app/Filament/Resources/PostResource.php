@@ -24,6 +24,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 use Filament\Forms\Set;
 use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\SelectColumn;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Support\Str;
 
@@ -137,11 +138,20 @@ class PostResource extends Resource
                     ->square()
                     ->height(50)
                     ->extraImgAttributes(['loading' => 'lazy']),
-                TextColumn::make('title')->wrap(),
-                TextColumn::make('author.name')->wrap(),
-                TextColumn::make('categories.name')->wrap(),
-                TextColumn::make('tags.name')->wrap(),
+                TextColumn::make('title')
+                    ->description(fn (Post $record): string => $record->author->name)
+                    ->wrap(),
+                // TextColumn::make()->wrap(),
+                TextColumn::make('categories.name')->badge()->wrap(),
+                TextColumn::make('tags.name')->badge()->wrap(),
                 TextColumn::make('views')->wrap(),
+                SelectColumn::make('status')
+                    ->options([
+                        'draft' => 'Borrador',
+                        'pending' => 'Pendiente',
+                        'published' => 'Publicado',
+                    ])->rules(['required'])
+                    ->selectablePlaceholder(false)
 
             ])
             ->filters([
