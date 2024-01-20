@@ -24,6 +24,9 @@ class Post extends Model
         'meta_description',
     ];
 
+
+    public $timestamps = false;
+
     // Relación con el modelo User (asumiendo que ya tienes un modelo User)
     public function author()
     {

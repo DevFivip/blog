@@ -13,6 +13,8 @@ class Category extends Model
         'name',
     ];
 
+    public $timestamps = false;
+
     public function posts()
     {
         return $this->belongsToMany(Post::class);
