@@ -15,6 +15,8 @@ class SectionHero extends Model  implements HasMedia
 {
     use InteractsWithMedia;
     use HasFactory;
+    protected $table = 'section_heros';
+
     protected $fillable = [
         "position",
         "title",

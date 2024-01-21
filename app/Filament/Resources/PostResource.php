@@ -52,7 +52,6 @@ class PostResource extends Resource
                                     ->live(onBlur: true)
                                     ->afterStateUpdated(fn (Set $set, ?string $state) => $set('slug', Str::slug($state)))->required(),
                                 TextInput::make('slug')->required(),
-
                                 RichEditor::make('content')
                                     ->fileAttachmentsDisk('public')
                                     ->required()
