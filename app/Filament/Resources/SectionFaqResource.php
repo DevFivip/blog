@@ -76,7 +76,9 @@ class SectionFaqResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->defaultSort('position')
+            ->reorderable('position');
     }
 
     public static function getRelations(): array
