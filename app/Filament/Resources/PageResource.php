@@ -2,11 +2,19 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\PostResource\Pages;
-use App\Filament\Resources\PostResource\RelationManagers;
-use App\Models\Post;
+use App\Filament\Resources\PageResource\Pages;
+use App\Filament\Resources\PageResource\RelationManagers;
+use App\Models\Page;
 use App\Models\User;
 use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+
+
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
@@ -15,32 +23,19 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-
 use Filament\Forms\Set;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\SelectColumn;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Support\Str;
-
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 
-class PostResource extends Resource
+class PageResource extends Resource
 {
-    protected static ?string $model = Post::class;
+    protected static ?string $model = Page::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-
-    protected static ?string $navigationGroup = 'Blog';
-
-    protected static ?string $navigationLabel = 'Posts';
-
 
     public static function form(Form $form): Form
     {
@@ -76,9 +71,7 @@ class PostResource extends Resource
                                         'underline',
                                         'undo',
                                     ]),
-                                Textarea::make('meta_description')
-                                    ->rows(3)
-                                    ->cols(20)
+
                             ])->columnSpan(2),
                         Grid::make([
                             'default' => 2,
@@ -87,18 +80,6 @@ class PostResource extends Resource
                             ->schema([
                                 Section::make()
                                     ->schema([
-
-                                        // FileUpload::make('featured_image')
-                                        //     ->label('Imagen destacada')
-                                        //     ->disk('public')
-                                        //     ->image()
-                                        //     ->imageEditor()
-                                        //     ->imageEditorAspectRatios([
-                                        //         '16:9',
-                                        //         '4:3',
-                                        //         '1:1',
-                                        //     ]),
-
                                         SpatieMediaLibraryFileUpload::make('featured_image')
                                             // ->multiple()
                                             ->imageEditor()
@@ -108,11 +89,6 @@ class PostResource extends Resource
                                     ]),
                                 Section::make('')
                                     ->schema([
-                                        Select::make('author_id')->label('Author')
-                                            ->options(User::get()->pluck('name', 'id'))
-                                            ->searchable()
-                                            ->native(false)->required(),
-                                        DateTimePicker::make('publish_date')->label('Fecha de Publicación')->native(false)->required(),
                                         Select::make('status')
                                             ->label('Status')
                                             ->options([
@@ -123,23 +99,7 @@ class PostResource extends Resource
                                             ->native(false)
                                             ->required(),
                                     ]),
-                                Section::make('')
-                                    ->schema([
-                                        Select::make('tags')
-                                            ->multiple()
-                                            ->relationship(titleAttribute: 'name')
-                                            ->createOptionForm(fn (Form $form) => TagResource::form($form))
-                                            ->native(false)
-                                            ->required(),
-                                        Select::make('categories')
-                                            ->multiple()
-                                            ->relationship(titleAttribute: 'name')
-                                            ->createOptionForm(fn (Form $form) => CategoryResource::form($form))
-                                            ->native(false)
-                                            ->required(),
-                                    ]),
                             ])->columnSpan(1),
-
                     ]),
             ]);
     }
@@ -148,23 +108,13 @@ class PostResource extends Resource
     {
         return $table
             ->columns([
-
-                // ImageColumn::make('featured_image')
-                //     ->disk('public')
-                //     ->square()
-                //     ->height(50)
-                //     ->extraImgAttributes(['loading' => 'lazy']),
-
                 SpatieMediaLibraryImageColumn::make('featured_image')
                     ->conversion('thumb'),
 
                 TextColumn::make('title')
-                    ->description(fn (Post $record): string => $record->author->name)
+                    ->description(fn (Page $record): string => Str::limit(strip_tags($record->content), 120, '...'))
                     ->wrap(),
-                // TextColumn::make()->wrap(),
-                TextColumn::make('categories.name')->badge()->wrap(),
-                TextColumn::make('tags.name')->badge()->wrap(),
-                TextColumn::make('views')->wrap(),
+
                 SelectColumn::make('status')
                     ->options([
                         'draft' => 'Borrador',
@@ -172,7 +122,6 @@ class PostResource extends Resource
                         'published' => 'Publicado',
                     ])->rules(['required'])
                     ->selectablePlaceholder(false)
-
             ])
             ->filters([
                 //
@@ -197,9 +146,9 @@ class PostResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListPosts::route('/'),
-            'create' => Pages\CreatePost::route('/create'),
-            'edit' => Pages\EditPost::route('/{record}/edit'),
+            'index' => Pages\ListPages::route('/'),
+            'create' => Pages\CreatePage::route('/create'),
+            'edit' => Pages\EditPage::route('/{record}/edit'),
         ];
     }
 }

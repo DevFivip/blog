@@ -18,10 +18,9 @@ class SectionFaq extends Model implements HasMedia
     use HasFactory;
 
     protected $fillable = [
-        "slug",
-        "title",
-        "content",
-        "status"
+        "position",
+        "question",
+        "answer",
     ];
 
     
